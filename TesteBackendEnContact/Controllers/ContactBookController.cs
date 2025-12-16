@@ -34,6 +34,7 @@ namespace TesteBackendEnContact.Controllers
         [HttpGet]
         public async Task<IEnumerable<IContactBook>> Get([FromServices] IContactBookRepository contactBookRepository)
         {
+            
             return await contactBookRepository.GetAllAsync();
         }
 

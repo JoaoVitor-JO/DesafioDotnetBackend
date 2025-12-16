@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/TesteBackendEnContact/bin/Debug/net5.0/TesteBackendEnContact.dll",
+            "program": "${workspaceFolder}/TesteBackendEnContact/bin/Debug/net8.0/TesteBackendEnContact.dll",
             "args": [],
             "cwd": "${workspaceFolder}/TesteBackendEnContact",
             "stopAtEntry": false,

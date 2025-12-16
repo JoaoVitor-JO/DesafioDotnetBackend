@@ -3,7 +3,9 @@ using Dapper.Contrib.Extensions;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using TesteBackendEnContact.Core.Domain.ContactBook;
 using TesteBackendEnContact.Core.Interface.ContactBook;
 using TesteBackendEnContact.Database;
@@ -27,6 +29,7 @@ namespace TesteBackendEnContact.Repository
             var dao = new ContactBookDao(contactBook);
 
             dao.Id = await connection.InsertAsync(dao);
+            
 
             return dao.Export();
         }
@@ -35,11 +38,11 @@ namespace TesteBackendEnContact.Repository
         public async Task DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            await connection.OpenAsync();
+            // DONE
+            var dao = await connection.GetAsync<ContactBookDao>(id);
 
-            // TODO
-            var sql = "";
-
-            await connection.ExecuteAsync(sql);
+            await connection.DeleteAsync(dao);
         }
 
 
@@ -48,19 +51,20 @@ namespace TesteBackendEnContact.Repository
         public async Task<IEnumerable<IContactBook>> GetAllAsync()
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
-
+            await connection.OpenAsync();
+            
             var query = "SELECT * FROM ContactBook";
             var result = await connection.QueryAsync<ContactBookDao>(query);
 
             var returnList = new List<IContactBook>();
 
-            foreach (var AgendaSalva in result.ToList())
-            {
-                IContactBook Agenda = new ContactBook(AgendaSalva.Id, AgendaSalva.Name.ToString());
-                returnList.Add(Agenda);
-            }
+             foreach (var AgendaSalva in result.ToList())
+             {
+                 IContactBook Agenda = new ContactBook(AgendaSalva.Id, AgendaSalva.Name.ToString());
+                 returnList.Add(Agenda);
+             }
 
-            return returnList.ToList();
+            return returnList;
         }
         public async Task<IContactBook> GetAsync(int id)
         {
@@ -84,7 +88,7 @@ namespace TesteBackendEnContact.Repository
         public ContactBookDao(IContactBook contactBook)
         {
             Id = contactBook.Id;
-            Name = Name;
+            Name = contactBook.Name; // estava Name = Name;
         }
 
         public IContactBook Export() => new ContactBook(Id, Name);

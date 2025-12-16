@@ -24,6 +24,7 @@ namespace TesteBackendEnContact.Repository
         public async Task<ICompany> SaveAsync(ICompany company)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            await connection.OpenAsync();
             var dao = new CompanyDao(company);
 
             if (dao.Id == 0)
@@ -37,6 +38,7 @@ namespace TesteBackendEnContact.Repository
         public async Task DeleteAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            await connection.OpenAsync();
             using var transaction = connection.BeginTransaction();
 
             var sql = new StringBuilder();
@@ -44,11 +46,14 @@ namespace TesteBackendEnContact.Repository
             sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
 
             await connection.ExecuteAsync(sql.ToString(), new { id }, transaction);
+
+            transaction.Commit();
         }
 
         public async Task<IEnumerable<ICompany>> GetAllAsync()
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+            
 
             var query = "SELECT * FROM Company";
             var result = await connection.QueryAsync<CompanyDao>(query);
@@ -59,8 +64,8 @@ namespace TesteBackendEnContact.Repository
         public async Task<ICompany> GetAsync(int id)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
-
-            var query = "SELECT * FROM Conpany where Id = @id";
+            
+            var query = "SELECT * FROM Company where Id = @id";
             var result = await connection.QuerySingleOrDefaultAsync<CompanyDao>(query, new { id });
 
             return result?.Export();
